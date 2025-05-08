@@ -1,12 +1,21 @@
 package com.taskmanager.controller;
 
-import com.taskmanager.model.Task;
-import com.taskmanager.service.TaskService;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.taskmanager.exception.TaskNotFoundException;
+import com.taskmanager.model.Task;
+import com.taskmanager.service.TaskService;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -28,8 +37,9 @@ public class TaskController {
     }
     
     @PostMapping
-    public Task createTask(@RequestBody Task task) {
-        return taskService.createTask(task);
+    public ResponseEntity<Task> createTask(@RequestBody Task task) {
+        Task createdTask = taskService.createTask(task);
+        return ResponseEntity.status(201).body(createdTask);
     }
     
     @PutMapping("/{id}")
@@ -37,7 +47,7 @@ public class TaskController {
         try {
             Task updatedTask = taskService.updateTask(id, taskDetails);
             return ResponseEntity.ok(updatedTask);
-        } catch (RuntimeException e) {
+        } catch (TaskNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -46,8 +56,8 @@ public class TaskController {
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         try {
             taskService.deleteTask(id);
-            return ResponseEntity.ok().build();
-        } catch (RuntimeException e) {
+            return ResponseEntity.noContent().build();
+        } catch (TaskNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }

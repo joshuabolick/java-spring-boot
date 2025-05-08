@@ -1,12 +1,14 @@
 package com.taskmanager.service;
 
-import com.taskmanager.model.Task;
-import com.taskmanager.repository.TaskRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.taskmanager.exception.TaskNotFoundException;
+import com.taskmanager.model.Task;
+import com.taskmanager.repository.TaskRepository;
 
 @Service
 public class TaskService {
@@ -28,7 +30,7 @@ public class TaskService {
     
     public Task updateTask(Long id, Task taskDetails) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + id));
         
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
@@ -39,7 +41,7 @@ public class TaskService {
     
     public void deleteTask(Long id) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + id));
         taskRepository.delete(task);
     }
 } 
